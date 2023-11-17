@@ -39,7 +39,7 @@ The link path would be
 
 ## Todo
  - [ ] Add configuration for different naming formats (ex. id-name.safetensor)
- - [ ] Add configuration for default data
+ - [x] Add configuration for default data
  - [ ] Add feature to auto populate fields
     - [ ] file type (checkpoint, lora, etc)
 	- [ ] sd version

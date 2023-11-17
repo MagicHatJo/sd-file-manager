@@ -45,10 +45,12 @@ class ConfigWindow(QDialog):
 						self.data[key]["bounds"] = {}
 						self.data[key]["bounds"]["lower"] = QLineEdit(str(settings["bounds"]["lower"]))
 						self.data[key]["bounds"]["upper"] = QLineEdit(str(settings["bounds"]["upper"]))
+						
 						box = QHBoxLayout()
 						box.addWidget(self.data[key]["bounds"]["lower"])
 						box.addWidget(QLabel(" - "))
 						box.addWidget(self.data[key]["bounds"]["upper"])
+						
 						self.form_layout.addRow(QLabel("\tBounds"), box)
 
 					if "remember_last" in settings:
