@@ -1,4 +1,5 @@
 import os
+import json
 
 from PyQt5.QtWidgets import (
 	QWidget,
@@ -8,7 +9,7 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtCore import Qt
 
-from app.util.widget_helpers import new_widget, new_button, get_edit_text, clear_layout
+from app.util.widget_helpers import new_widget, new_button, get_text, clear_layout
 from app.util import config
 
 class EmptyWidget(QWidget):
@@ -41,8 +42,11 @@ class FileDetailsWidget(QWidget):
 
 		self.config = config.load()
 		
-		self.file_path = None
-		self.file_name = None
+		self.file_path = ""
+		self.file_name = ""
+
+		self.destination_path = ""
+		self.destination_display = QLineEdit()
 
 		self.data = self._init_data()
 		self.layout = self._init_layout()
@@ -57,7 +61,8 @@ class FileDetailsWidget(QWidget):
 				self.data[key].setText(self.config[key].get("default", value))
 					
 		self.file_path = file_path
-		self.file_name = os.path.basename(self.file_path)
+		self.file_name, self.file_extension = os.path.splitext(os.path.basename(file_path))
+		print(f"File Name: {self.file_name}")
 		
 		for key in self.data:
 			# Future proofing
@@ -69,34 +74,42 @@ class FileDetailsWidget(QWidget):
 	
 	def button_save(self):
 		# TODO customize save path
-		destination_path = os.path.join(
-			self.config["default_path"],
-			get_edit_text(self.data["Model Type"], QLineEdit),
-			get_edit_text(self.data["SD Version"], QLineEdit),
-			get_edit_text(self.data["Category"], QLineEdit)
-		)
-		destination_file = get_edit_text(self.data["Model Name"], QLineEdit) + os.path.splitext(self.file_path)[1]
+		destination_file = get_text(self.data["Model Name"]) + os.path.splitext(self.file_path)[1]
 
-		if not os.path.exists(destination_path):
-			os.makedirs(destination_path)
+		if not os.path.exists(self.destination_path):
+			os.makedirs(self.destination_path)
 
-		os.rename(self.file_path, os.path.join(destination_path, destination_file))
+		os.rename(self.file_path, get_text(self.destination_display))
 
 		data = {
 			"original name"    : self.file_name,
-			"id"               : get_edit_text(self.data["Model ID"], QLineEdit),
-			"description"      : get_edit_text(self.data["Description"], QTextEdit),
-			"sd version"       : get_edit_text(self.data["SD Version"], QLineEdit),
-			"activation text"  : get_edit_text(self.data["Activation"], QLineEdit),
-			"preferred weight" : get_edit_text(self.data["Weight"], QLineEdit),
-			"notes"            : get_edit_text(self.data["Notes"], QTextEdit)
+			"id"               : get_text(self.data["Model ID"]),
+			"description"      : get_text(self.data["Description"]),
+			"sd version"       : get_text(self.data["SD Version"]),
+			"activation text"  : get_text(self.data["Activation"]),
+			"preferred weight" : get_text(self.data["Weight"]),
+			"notes"            : get_text(self.data["Notes"])
 		}
 
-		with open(os.path.join(destination_path, os.path.splitext(destination_file)[0] + ".json"), 'w') as f:
+		with open(get_text(self.destination_display).replace(self.file_extension, ".json"), 'w') as f:
 			json.dump(data, f, indent=4)
 
+	def update(self):
+
+		self.destination_path = os.path.join(
+			self.config["default_path"],
+			get_text(self.data["Model Type"]),
+			get_text(self.data["SD Version"]),
+			get_text(self.data["Category"])
+		)
+
+		self.destination_display.setText(os.path.join(
+			self.destination_path,
+			get_text(self.data["Model Name"]) + self.file_extension
+		))
+
 	def _init_data(self):
-		return {
+		data = {
 			"Model Name"  : QLineEdit(),
 			"Model Type"  : QLineEdit(),
 			"Category"    : QLineEdit(),
@@ -108,9 +121,20 @@ class FileDetailsWidget(QWidget):
 			"Notes"       : QTextEdit()
 		}
 
+		data["Model Name"].textChanged.connect(self.update)
+		data["Model Type"].textChanged.connect(self.update)
+		data["Category"].textChanged.connect(self.update)
+		data["Model ID"].textChanged.connect(self.update)
+		data["SD Version"].textChanged.connect(self.update)
+
+		return data
+
 	def _init_layout(self):
 		layout = QVBoxLayout()
-		
+
+		layout.addWidget(new_widget("From: ", QLabel(self.file_path)))
+		layout.addWidget(new_widget("To: ", self.destination_display))
+
 		for label, data in self.data.items():
 			layout.addWidget(new_widget(label, data))
 

@@ -14,7 +14,7 @@ class FileManager(QMainWindow):
 	def __init__(self):
 		super().__init__()
 		self.setWindowTitle("Stable Diffusion File Manager")
-		self.resize(400, 600)
+		self.resize(500, 600)
 		self.setAcceptDrops(True)
 
 		# Menu Bar

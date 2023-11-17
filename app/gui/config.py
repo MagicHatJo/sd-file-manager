@@ -82,6 +82,7 @@ class ConfigWindow(QDialog):
 			data = {}
 
 			for key, settings in self.data.items():
+				key = "_".join(key).lower()
 				match settings:
 					case QLineEdit():
 						data[key] = settings.text()

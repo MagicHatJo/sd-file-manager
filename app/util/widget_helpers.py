@@ -38,12 +38,12 @@ def new_radio_button_group(options, default):
 	widget.setLayout(layout)
 	return widget
 
-def get_edit_text(widget, line_class):
-	line_edit = widget.findChildren(line_class)[0]
-	if line_class is QLineEdit:
-		return line_edit.text()
-	if line_class is QTextEdit:
-		return line_edit.toPlainText()
+def get_text(widget):
+	match widget:
+		case QLineEdit():
+			return widget.text()
+		case QTextEdit():
+			return widget.toPlainText()
 	return None
 
 def clear_layout(layout):
