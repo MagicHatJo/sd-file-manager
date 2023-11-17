@@ -78,7 +78,6 @@ class ConfigWindow(QDialog):
 					pass
 			return data
 
-		# Go through layout, turn data into json
 		try:
 			data = {}
 
