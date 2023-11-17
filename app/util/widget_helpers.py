@@ -4,21 +4,11 @@ from PyQt5.QtWidgets import (
 	QLineEdit, QTextEdit, QCheckBox
 )
 
-def new_widget(line_name, line_class, default_text=""):
-	if type(default_text) == float:
-		default_text = str(default_text)
-	if type(default_text) == list:
-		default_text = ", ".join(map(str, default_text))
-
+def new_widget(line_name, line_class):
 	widget = QWidget()
 	widget.layout = QHBoxLayout(widget)
-
-	label = QLabel(line_name)
-	line_edit = line_class()
-	line_edit.setText(default_text)
-
-	widget.layout.addWidget(label)
-	widget.layout.addWidget(line_edit)
+	widget.layout.addWidget(QLabel(line_name))
+	widget.layout.addWidget(line_class)
 	return widget
 
 def new_button(button_name, button_function):

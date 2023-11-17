@@ -33,6 +33,9 @@ class EmptyWidget(QWidget):
 		self.setLayout(self.layout)
 
 class FileDetailsWidget(QWidget):
+	'''
+	Widget handling file data.
+	'''
 	def __init__(self):
 		super().__init__()
 
@@ -40,19 +43,32 @@ class FileDetailsWidget(QWidget):
 		
 		self.file_path = None
 		self.file_name = None
-		self.layout = QVBoxLayout()
+
+		self.data = self._init_data()
+		self.layout = self._init_layout()
+
 		self.setLayout(self.layout)
 
-		self.previous_data = {}
-
 	def load_file(self, file_path):
+		def set_text(key, value=""):
+			if value != "" or key not in self.config:
+				self.data[key].setText(value)
+			elif not self.config[key].get("remember_last", False):
+				self.data[key].setText(self.config[key].get("default", value))
+					
 		self.file_path = file_path
 		self.file_name = os.path.basename(self.file_path)
 		
-		clear_layout(self.layout)
-		self._setup_layout()
+		for key in self.data:
+			# Future proofing
+			match key:
+				case "Model Name":
+					set_text("Model Name", self.file_name)
+				case _:
+					set_text(key)
 	
 	def button_save(self):
+		# TODO customize save path
 		destination_path = os.path.join(
 			self.config["default_path"],
 			get_edit_text(self.data["Model Type"], QLineEdit),
@@ -76,43 +92,28 @@ class FileDetailsWidget(QWidget):
 			"notes"            : get_edit_text(self.data["Notes"], QTextEdit)
 		}
 
-		# Previous data used for "remember last" setting
-		self.previous_data = {
-			"model type": get_edit_text(self.data["Model Type"], QLineEdit),
-			"category"  : get_edit_text(self.data["Category"], QLineEdit),
-			"sd_version": get_edit_text(self.data["SD Version"], QLineEdit),
-			"preferred_weight": get_edit_text(self.data["Weight"], QLineEdit)
-		}
-
 		with open(os.path.join(destination_path, os.path.splitext(destination_file)[0] + ".json"), 'w') as f:
 			json.dump(data, f, indent=4)
-	
-	def _setup_layout(self):
 
-		self.data = {
-			"Model Name"  : new_widget("Model Name", QLineEdit, os.path.splitext(self.file_name)[0]),
-			"Model Type"  : new_widget("Model Type", QLineEdit, "Lora"),
-			"Category"    : new_widget("Category", QLineEdit),
-			"Model ID"    : new_widget("Model ID", QLineEdit),
-			"Description" : new_widget("Description", QTextEdit),
-			"SD Version"  : new_widget("SD Version", QLineEdit, "1.5"),
-			"Activation"  : new_widget("Activation Text", QLineEdit),
-			"Weight"      : new_widget("Preferred Weight", QLineEdit, "1"),
-			"Notes"       : new_widget("Notes", QTextEdit)
+	def _init_data(self):
+		return {
+			"Model Name"  : QLineEdit(),
+			"Model Type"  : QLineEdit(),
+			"Category"    : QLineEdit(),
+			"Model ID"    : QLineEdit(),
+			"Description" : QTextEdit(),
+			"SD Version"  : QLineEdit(),
+			"Activation"  : QLineEdit(),
+			"Weight"      : QLineEdit(),
+			"Notes"       : QTextEdit()
 		}
 
-		# Category
-		self.layout.addWidget(self.data["Model Name"])
-		self.layout.addWidget(self.data["Model Type"])
-		self.layout.addWidget(self.data["Category"])
+	def _init_layout(self):
+		layout = QVBoxLayout()
+		
+		for label, data in self.data.items():
+			layout.addWidget(new_widget(label, data))
 
-		# Data
-		self.layout.addWidget(self.data["Model ID"])
-		self.layout.addWidget(self.data["Description"])
-		self.layout.addWidget(self.data["SD Version"])
-		self.layout.addWidget(self.data["Activation"])
-		self.layout.addWidget(self.data["Weight"])
-		self.layout.addWidget(self.data["Notes"])
+		layout.addWidget(new_button("Save", self.button_save))
 
-		# Finish
-		self.layout.addWidget(new_button("Save", self.button_save))
+		return layout

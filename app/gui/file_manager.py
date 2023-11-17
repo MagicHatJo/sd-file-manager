@@ -47,9 +47,11 @@ class FileManager(QMainWindow):
 			event.setDropAction(Qt.CopyAction)
 			try:
 				# TODO file validation
+				print("Loading in a file")
 				self.widget_details.load_file(event.mimeData().urls()[0].toLocalFile())
 				self.setCentralWidget(self.widget_details)
 			except:
+				print("Failed to load file")
 				self.setCentralWidget(self.widget_empty)
 			event.accept()
 		else:
