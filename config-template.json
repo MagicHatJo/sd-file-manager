@@ -1,3 +1,28 @@
 {
-  "default_path": "/path/to/folder"
+	"Default Path": "/path/to/folder",
+	"Model Type": {
+		"default": "Lora",
+		"remember_last": true
+	},
+	"Category": {
+		"default": "",
+		"remember_last": false
+	},
+	"SD Version": {
+		"default": 1.5,
+		"options": [
+			1.5,
+			2.0,
+			"SDXL"
+		],
+		"remember_last": true
+	},
+	"Preferred Weight": {
+		"default": 1.0,
+		"bounds": {
+			"lower": -10,
+			"upper": 10
+		},
+		"remember_last": false
+	}
 }

@@ -1,5 +1,4 @@
 import os
-import json
 
 from PyQt5.QtWidgets import (
 	QWidget,
@@ -10,8 +9,13 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import Qt
 
 from app.util.widget_helpers import new_widget, new_button, get_edit_text, clear_layout
+from app.util import config
 
 class EmptyWidget(QWidget):
+	'''
+	Placeholder widget for no file loaded.
+	Should not interact with data.
+	'''
 	def __init__(self):
 		super().__init__()
 		self.layout = QVBoxLayout()
@@ -32,21 +36,14 @@ class FileDetailsWidget(QWidget):
 	def __init__(self):
 		super().__init__()
 
-		self.load_config("config.json")
+		self.config = config.load()
 		
 		self.file_path = None
 		self.file_name = None
 		self.layout = QVBoxLayout()
 		self.setLayout(self.layout)
 
-	def load_config(self, file_name):
-		try:
-			with open(file_name, 'r') as f:
-				self.config = json.load(f)
-		except FileNotFoundError:
-			print(f"File '{file_name}' not found.")
-		except json.JSONDecodeError as e:
-			print(f"Error decoding JSON from '{file_name}': {e}")
+		self.previous_data = {}
 
 	def load_file(self, file_path):
 		self.file_path = file_path
@@ -77,6 +74,14 @@ class FileDetailsWidget(QWidget):
 			"activation text"  : get_edit_text(self.data["Activation"], QLineEdit),
 			"preferred weight" : get_edit_text(self.data["Weight"], QLineEdit),
 			"notes"            : get_edit_text(self.data["Notes"], QTextEdit)
+		}
+
+		# Previous data used for "remember last" setting
+		self.previous_data = {
+			"model type": get_edit_text(self.data["Model Type"], QLineEdit),
+			"category"  : get_edit_text(self.data["Category"], QLineEdit),
+			"sd_version": get_edit_text(self.data["SD Version"], QLineEdit),
+			"preferred_weight": get_edit_text(self.data["Weight"], QLineEdit)
 		}
 
 		with open(os.path.join(destination_path, os.path.splitext(destination_file)[0] + ".json"), 'w') as f:
