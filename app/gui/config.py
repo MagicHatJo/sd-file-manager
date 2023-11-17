@@ -1,3 +1,4 @@
+import re
 from PyQt5.QtWidgets import (
     QDialog, QLabel, QVBoxLayout, QHBoxLayout, QFormLayout,
     QLineEdit, QCheckBox,
@@ -18,62 +19,92 @@ class ConfigWindow(QDialog):
 
 	def init_ui(self):
 		layout = QVBoxLayout()
-		form_layout = QFormLayout()
+		self.form_layout = QFormLayout()
 
 		for key, settings in self.config.items():
 			match settings:
 				case str():
 					self.data[key] = QLineEdit(settings)
-					form_layout.addRow(
+					self.form_layout.addRow(
 						QLabel(key),
 						self.data[key]
 					)
 				case dict():
 					self.data[key] = {}
-					form_layout.addRow(QLabel(key))
+					self.form_layout.addRow(QLabel(key))
 
 					if "default" in settings:
 						self.data[key]["default"] = QLineEdit(str(settings["default"]))
-						form_layout.addRow(QLabel("\tDefault"), self.data[key]["default"])
+						self.form_layout.addRow(QLabel("\tDefault"), self.data[key]["default"])
 					
 					if "options" in settings:
 						self.data[key]["options"] = QLineEdit(", ".join(map(str, settings["options"])))
-						form_layout.addRow(QLabel("\tOptions"), self.data[key]["options"])
+						self.form_layout.addRow(QLabel("\tOptions"), self.data[key]["options"])
 
 					if "bounds" in settings:
-						self.data[key]["bounds"] = QHBoxLayout()
-						self.data[key]["bounds"].addWidget(QLineEdit(str(settings["bounds"]["lower"])))
-						self.data[key]["bounds"].addWidget(QLabel(" - "))
-						self.data[key]["bounds"].addWidget(QLineEdit(str(settings["bounds"]["upper"])))
-						form_layout.addRow(QLabel("\tBounds"), self.data[key]["bounds"])
+						self.data[key]["bounds"] = {}
+						self.data[key]["bounds"]["lower"] = QLineEdit(str(settings["bounds"]["lower"]))
+						self.data[key]["bounds"]["upper"] = QLineEdit(str(settings["bounds"]["upper"]))
+						box = QHBoxLayout()
+						box.addWidget(self.data[key]["bounds"]["lower"])
+						box.addWidget(QLabel(" - "))
+						box.addWidget(self.data[key]["bounds"]["upper"])
+						self.form_layout.addRow(QLabel("\tBounds"), box)
 
 					if "remember_last" in settings:
 						self.data[key]["remember_last"] = QCheckBox()
 						self.data[key]["remember_last"].setChecked(settings["remember_last"])
-						form_layout.addRow(QLabel("\tRemember Last"), self.data[key]["remember_last"])
+						self.form_layout.addRow(QLabel("\tRemember Last"), self.data[key]["remember_last"])
 
 		save_button = QPushButton("Save")
 		save_button.clicked.connect(self.save_settings)
 
-		layout.addLayout(form_layout)
+		layout.addLayout(self.form_layout)
 		layout.addWidget(save_button)
 
 		self.setLayout(layout)
 	
 	def save_settings(self):
+
+		def filter_data(data):
+			# Sanitize data and return in correct typing
+			data = data.strip()
+			if re.match(r'^-?\d+$', data):
+				data = int(data)
+			elif re.match(r'^-?\d+\.\d*$', data):
+				try:
+					data = float(data)
+				except ValueError:
+					pass
+			return data
+
 		# Go through layout, turn data into json
-		data = {}
+		try:
+			data = {}
 
-		form_layout = self.layout.itemAt(0).widget()
+			for key, settings in self.data.items():
+				match settings:
+					case QLineEdit():
+						data[key] = settings.text()
 
-		for i in range(form_layout.rowCount()):
-			label_widget = self.form_layout.itemAt(i, QFormLayout.LabelRole).widget()
-			field_widget = self.form_layout.itemAt(i, QFormLayout.FieldRole).widget()
+					case dict():
+						data[key] = {}
+						if "default" in settings:
+							data[key]["default"] = filter_data(settings["default"].text())
 
-			print(label_widget)
+						if "options" in settings:
+							data[key]["options"] = [filter_data(option) for option in settings["options"].text().split(",")]
 
+						if "bounds" in settings:
+							data[key]["bounds"] = {
+								"lower" : filter_data(settings["bounds"]["lower"].text()),
+								"upper" : filter_data(settings["bounds"]["upper"].text())
+							}
+						
+						if "remember_last" in settings:
+							data[key]["remember_last"] = settings["remember_last"].isChecked()
 
-		print(data)
-		#config.save(data)
-
-		# close window
+			config.save(data)
+			self.accept()
+		except:
+			self.reject()

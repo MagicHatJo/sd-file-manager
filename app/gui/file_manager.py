@@ -1,6 +1,6 @@
 import os
 
-from PyQt5.QtWidgets import QApplication, QMainWindow, QMenuBar, QAction
+from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog, QMenuBar, QAction
 from PyQt5.QtCore import Qt
 
 from app.gui.widgets import EmptyWidget, FileDetailsWidget
@@ -60,4 +60,8 @@ class FileManager(QMainWindow):
 	# Config
 	def action_config(self):
 		config_window = ConfigWindow()
-		config_window.exec()
+		result = config_window.exec_()
+		if result == QDialog.Accepted:
+			print("Save successfull")
+		else:
+			print("Did not save")
