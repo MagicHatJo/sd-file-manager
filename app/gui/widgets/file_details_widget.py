@@ -12,27 +12,6 @@ from PyQt5.QtCore import Qt
 from app.util.widget_helpers import new_widget, new_button, get_text, clear_layout
 from app.util import config
 
-class EmptyWidget(QWidget):
-	'''
-	Placeholder widget for no file loaded.
-	Should not interact with data.
-	'''
-	def __init__(self):
-		super().__init__()
-		self.layout = QVBoxLayout()
-
-		self.label = QLabel(self)
-		self.label.setAlignment(Qt.AlignCenter)
-		self.label.setText('\n\n Drop File Here \n\n')
-		self.label.setStyleSheet('''
-			QLabel{
-				border: 4px dashed #aaa
-			}
-		''')
-
-		self.layout.addWidget(self.label)
-		self.setLayout(self.layout)
-
 class FileDetailsWidget(QWidget):
 	'''
 	Widget handling file data.
@@ -44,6 +23,7 @@ class FileDetailsWidget(QWidget):
 		
 		self.file_path = ""
 		self.file_name = ""
+		self.origin_path_display = QLabel()
 
 		self.destination_path = ""
 		self.destination_display = QLineEdit()
@@ -61,6 +41,7 @@ class FileDetailsWidget(QWidget):
 				self.data[key].setText(self.config[key].get("default", value))
 					
 		self.file_path = file_path
+		self.origin_path_display.setText(self.file_path)
 		self.file_name, self.file_extension = os.path.splitext(os.path.basename(file_path))
 		print(f"File Name: {self.file_name}")
 		
@@ -132,7 +113,7 @@ class FileDetailsWidget(QWidget):
 	def _init_layout(self):
 		layout = QVBoxLayout()
 
-		layout.addWidget(new_widget("From: ", QLabel(self.file_path)))
+		layout.addWidget(new_widget("From: ", self.origin_path_display))
 		layout.addWidget(new_widget("To: ", self.destination_display))
 
 		for label, data in self.data.items():

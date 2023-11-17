@@ -3,7 +3,7 @@ import os
 from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog, QMenuBar, QAction
 from PyQt5.QtCore import Qt
 
-from app.gui.widgets import EmptyWidget, FileDetailsWidget
+from app.gui.widgets import DropboxWidget, FileDetailsWidget
 from app.gui.config import ConfigWindow
 
 class FileManager(QMainWindow):
@@ -25,9 +25,9 @@ class FileManager(QMainWindow):
 		self.menu.addAction(action_config)
 
 		# Content
-		self.widget_empty   = EmptyWidget()
+		self.widget_dropbox = DropboxWidget()
 		self.widget_details = FileDetailsWidget()
-		self.setCentralWidget(self.widget_empty)
+		self.setCentralWidget(self.widget_dropbox)
 
 	# Event Handler
 	def dragEnterEvent(self, event):
@@ -52,7 +52,7 @@ class FileManager(QMainWindow):
 				self.setCentralWidget(self.widget_details)
 			except:
 				print("Failed to load file")
-				self.setCentralWidget(self.widget_empty)
+				self.setCentralWidget(self.widget_dropbox)
 			event.accept()
 		else:
 			event.ignore()
