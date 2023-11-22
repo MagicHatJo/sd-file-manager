@@ -45,7 +45,6 @@ class FileDetailsWidget(QWidget):
 		self.file_path = file_path
 		self.origin_path_display.setText(self.file_path)
 		self.file_name, self.file_extension = os.path.splitext(os.path.basename(file_path))
-		print(f"File Name: {self.file_name}")
 		
 		for key in self.data:
 			# Future proofing
@@ -60,11 +59,6 @@ class FileDetailsWidget(QWidget):
 		Connects to Save button.
 		Manages file saving.
 		'''
-		if not os.path.exists(self.destination_path):
-			os.makedirs(self.destination_path)
-
-		os.rename(self.file_path, get_text(self.destination_display))
-
 		# Create output format
 		data = {
 			"original name"    : self.file_name,
@@ -75,8 +69,16 @@ class FileDetailsWidget(QWidget):
 			"preferred weight" : get_text(self.data["Weight"]),
 			"notes"            : get_text(self.data["Notes"])
 		}
+		# TODO error handle this part
+		# TODO add image moving here
+		# Ensure destination path
+		if not os.path.exists(self.destination_path):
+			os.makedirs(self.destination_path)
 
-		# Save to destination
+		# Move file
+		os.rename(self.file_path, get_text(self.destination_display))
+
+		# Create json
 		with open(get_text(self.destination_display).replace(self.file_extension, ".json"), 'w') as f:
 			json.dump(data, f, indent=4)
 

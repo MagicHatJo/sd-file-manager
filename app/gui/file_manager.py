@@ -1,10 +1,12 @@
 import os
+import logging
 
 from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog, QMenuBar, QAction
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore    import Qt
 
 from app.gui.widgets import DropboxWidget, FileDetailsWidget
-from app.gui.config import ConfigWindow
+from app.gui.windows import LogWindow
+from app.gui.config  import ConfigWindow
 
 class FileManager(QMainWindow):
 	'''
@@ -17,12 +19,19 @@ class FileManager(QMainWindow):
 		self.resize(500, 600)
 		self.setAcceptDrops(True)
 
+		# Windows
+		self.log_window = LogWindow()
+
 		# Menu Bar
 		self.menu = self.menuBar()
 
 		action_config = QAction("Config", self)
 		action_config.triggered.connect(self.action_config)
 		self.menu.addAction(action_config)
+
+		action_log = QAction("Log", self)
+		action_log.triggered.connect(self.action_log)
+		self.menu.addAction(action_log)
 
 		# Content
 		self.widget_dropbox = DropboxWidget()
@@ -47,23 +56,24 @@ class FileManager(QMainWindow):
 			event.setDropAction(Qt.CopyAction)
 			try:
 				# TODO file validation
-				print("Loading in a file")
 				self.widget_details.load_file(event.mimeData().urls()[0].toLocalFile())
 				self.setCentralWidget(self.widget_details)
+				logging.info(f"Loaded {event.mimeData().urls()[0].toLocalFile()}")
 			except:
-				print("Failed to load file")
 				self.setCentralWidget(self.widget_dropbox)
+				logging.error(f"Failed to load {event.mimeData().urls()[0].toLocalFile()}")
 			event.accept()
 		else:
 			event.ignore()
 	
-	# Menu Bar
-
-	# Config
+	########## Menu Bar ##########
 	def action_config(self):
 		config_window = ConfigWindow()
 		result = config_window.exec_()
 		if result == QDialog.Accepted:
-			print("Save successfull")
+			logging.info("Saved configuration")
 		else:
-			print("Did not save")
+			logging.error("Could not save configuration")
+	
+	def action_log(self):
+		self.log_window.show()
