@@ -49,7 +49,7 @@ The link path would be
 	- [ ] Categories  (dropdown)
 	- [ ] SD Version  (dropdown)
 	- [ ] Preferred Weight (slider)
- - [ ] Logging
+ - [x] Logging
 
 ## License
 [GPLv3](https://www.gnu.org/licenses/gpl-3.0.html).

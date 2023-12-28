@@ -1,7 +1,7 @@
 import os
 import logging
 
-from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog, QMenuBar, QAction
+from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QDialog, QMenuBar, QAction, QVBoxLayout
 from PyQt5.QtCore    import Qt
 
 from app.gui.widgets import DropboxWidget, FileDetailsWidget
@@ -17,7 +17,6 @@ class FileManager(QMainWindow):
 		super().__init__()
 		self.setWindowTitle("Stable Diffusion File Manager")
 		self.resize(500, 600)
-		self.setAcceptDrops(True)
 
 		# Windows
 		self.log_window = LogWindow()
@@ -36,35 +35,44 @@ class FileManager(QMainWindow):
 		# Content
 		self.widget_dropbox = DropboxWidget()
 		self.widget_details = FileDetailsWidget()
-		self.setCentralWidget(self.widget_dropbox)
 
-	# Event Handler
-	def dragEnterEvent(self, event):
-		if event.mimeData().hasUrls():
-			event.accept()
-		else:
-			event.ignore()
+		self.widget_dropbox.load = self.widget_details.load_file
+		
+		self.layout = QVBoxLayout()
+		self.layout.addWidget(self.widget_dropbox)
+		self.layout.addWidget(self.widget_details)
 
-	def dragMoveEvent(self, event):
-		if event.mimeData().hasUrls():
-			event.accept()
-		else:
-			event.ignore()
+		self.central_widget = QWidget(self)
+		self.central_widget.setLayout(self.layout)
+		self.setCentralWidget(self.central_widget)
 
-	def dropEvent(self, event):
-		if event.mimeData().hasUrls():
-			event.setDropAction(Qt.CopyAction)
-			try:
-				# TODO file validation
-				self.widget_details.load_file(event.mimeData().urls()[0].toLocalFile())
-				self.setCentralWidget(self.widget_details)
-				logging.info(f"Loaded {event.mimeData().urls()[0].toLocalFile()}")
-			except:
-				self.setCentralWidget(self.widget_dropbox)
-				logging.error(f"Failed to load {event.mimeData().urls()[0].toLocalFile()}")
-			event.accept()
-		else:
-			event.ignore()
+	########## Event Handler ##########
+	# def dragEnterEvent(self, event):
+	# 	if event.mimeData().hasUrls():
+	# 		event.accept()
+	# 	else:
+	# 		event.ignore()
+
+	# def dragMoveEvent(self, event):
+	# 	if event.mimeData().hasUrls():
+	# 		event.accept()
+	# 	else:
+	# 		event.ignore()
+
+	# def dropEvent(self, event):
+	# 	if event.mimeData().hasUrls():
+	# 		event.setDropAction(Qt.CopyAction)
+	# 		try:
+	# 			# TODO file validation
+	# 			self.widget_details.load_file(event.mimeData().urls()[0].toLocalFile())
+	# 			# self.setCentralWidget(self.widget_details)
+	# 			logging.info(f"Loaded {event.mimeData().urls()[0].toLocalFile()}")
+	# 		except:
+	# 			self.setCentralWidget(self.widget_dropbox)
+	# 			logging.error(f"Failed to load {event.mimeData().urls()[0].toLocalFile()}")
+	# 		event.accept()
+	# 	else:
+	# 		event.ignore()
 	
 	########## Menu Bar ##########
 	def action_config(self):
