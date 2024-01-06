@@ -29,37 +29,35 @@ class ConfigWindow(QDialog):
 		)
 
 		# Layout
-		data_layout = {}
+		self.data["layout"] = {}
 		for key, settings in self.config["layout"].items():
-			data_layout[key] = {}
+			self.data["layout"][key] = {}
 			self.form_layout.addRow(QLabel(key))
 
 			if "default" in settings:
-				data_layout[key]["default"] = QLineEdit(str(settings["default"]))
-				self.form_layout.addRow(QLabel("\tDefault"), data_layout[key]["default"])
+				self.data["layout"][key]["default"] = QLineEdit(str(settings["default"]))
+				self.form_layout.addRow(QLabel("\tDefault"), self.data["layout"][key]["default"])
 			
 			if "options" in settings:
-				data_layout[key]["options"] = QLineEdit(", ".join(map(str, settings["options"])))
-				self.form_layout.addRow(QLabel("\tOptions"), data_layout[key]["options"])
+				self.data["layout"][key]["options"] = QLineEdit(", ".join(map(str, settings["options"])))
+				self.form_layout.addRow(QLabel("\tOptions"), self.data["layout"][key]["options"])
 
 			if "bounds" in settings:
-				data_layout[key]["bounds"] = {}
-				data_layout[key]["bounds"]["lower"] = QLineEdit(str(settings["bounds"]["lower"]))
-				data_layout[key]["bounds"]["upper"] = QLineEdit(str(settings["bounds"]["upper"]))
+				self.data["layout"][key]["bounds"] = {}
+				self.data["layout"][key]["bounds"]["lower"] = QLineEdit(str(settings["bounds"]["lower"]))
+				self.data["layout"][key]["bounds"]["upper"] = QLineEdit(str(settings["bounds"]["upper"]))
 				
 				box = QHBoxLayout()
-				box.addWidget(data_layout[key]["bounds"]["lower"])
+				box.addWidget(self.data["layout"][key]["bounds"]["lower"])
 				box.addWidget(QLabel(" - "))
-				box.addWidget(data_layout[key]["bounds"]["upper"])
+				box.addWidget(self.data["layout"][key]["bounds"]["upper"])
 				
 				self.form_layout.addRow(QLabel("\tBounds"), box)
 
 			if "remember_last" in settings:
-				data_layout[key]["remember_last"] = QCheckBox()
-				data_layout[key]["remember_last"].setChecked(settings["remember_last"])
-				self.form_layout.addRow(QLabel("\tRemember Last"), data_layout[key]["remember_last"])
-		
-		self.data["layout"] = data_layout
+				self.data["layout"][key]["remember_last"] = QCheckBox()
+				self.data["layout"][key]["remember_last"].setChecked(settings["remember_last"])
+				self.form_layout.addRow(QLabel("\tRemember Last"), self.data["layout"][key]["remember_last"])
 
 		save_button = QPushButton("Save")
 		save_button.clicked.connect(self.save_settings)
@@ -84,34 +82,31 @@ class ConfigWindow(QDialog):
 			return data
 
 		try:
-			data = {}
-
-			data["default_path"] = self.data["default_path"].text()
-			data["layout"] = {}
+			self.config["default_path"] = self.data["default_path"].text()
 
 			for key, settings in self.data["layout"].items():
 				match settings:
 					case QLineEdit():
-						data["layout"][key] = settings.text()
+						self.config["layout"][key] = settings.text()
 
 					case dict():
-						data["layout"][key] = {"widget" : self.config["layout"][key]["widget"]}
+						self.config["layout"][key] = {"widget" : self.config["layout"][key]["widget"]}
 						if "default" in settings:
-							data["layout"][key]["default"] = filter_data(settings["default"].text())
+							self.config["layout"][key]["default"] = filter_data(settings["default"].text())
 
 						if "options" in settings:
-							data["layout"][key]["options"] = [filter_data(option) for option in settings["options"].text().split(",")]
+							self.config["layout"][key]["options"] = [filter_data(option) for option in settings["options"].text().split(",")]
 
 						if "bounds" in settings:
-							data["layout"][key]["bounds"] = {
+							self.config["layout"][key]["bounds"] = {
 								"lower" : filter_data(settings["bounds"]["lower"].text()),
 								"upper" : filter_data(settings["bounds"]["upper"].text())
 							}
 						
 						if "remember_last" in settings:
-							data["layout"][key]["remember_last"] = settings["remember_last"].isChecked()
+							self.config["layout"][key]["remember_last"] = settings["remember_last"].isChecked()
 
-			config.save(data)
+			config.save(self.config)
 			self.accept()
 		except:
 			self.reject()
