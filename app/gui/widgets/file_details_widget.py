@@ -19,8 +19,7 @@ class FileDetailsWidget(QWidget):
 		
 		self.file_path = ""
 		self.file_name = ""
-		self.file_extension   = ""
-		self.destination_path = ""
+		self.file_extension = ""
 
 		self.data   = {}
 		self.layout = QVBoxLayout()
@@ -64,14 +63,15 @@ class FileDetailsWidget(QWidget):
 		# TODO error handle this part
 		# TODO add image moving here
 		# Ensure destination path
-		if not os.path.exists(self.destination_path):
-			os.makedirs(self.destination_path)
+		dir = os.path.dirname(self.data["Path"].text)
+		if not os.path.exists(dir):
+			os.makedirs(dir)
 
 		# Move file
-		shutil.move(self.file_path, get_text(self.destination_display))
+		shutil.move(self.file_path, self.data["Path"].text)
 
 		# Create json
-		with open(get_text(self.destination_display).replace(self.file_extension, ".json"), 'w') as f:
+		with open(self.data["Path"].text.replace(self.file_extension, ".json"), 'w') as f:
 			json.dump(data, f, indent=4)
 
 	########## Constructors ##########
@@ -109,7 +109,6 @@ class FileDetailsWidget(QWidget):
 	def _connect_destination_paths(self, data):
 		# TODO make this dynamic based on configuration path options
 		data["Model Name"].connect(self._update_destination_path)
-		
 		data["Model Type"].connect(self._update_destination_path)
 		data["Category"  ].connect(self._update_destination_path)
 		data["Model ID"  ].connect(self._update_destination_path)
@@ -132,7 +131,7 @@ class FileDetailsWidget(QWidget):
 		Updates destination display.
 		'''
 		# TODO make this not hardcoded.
-		self.destination_path = os.path.join(
+		path = os.path.join(
 			self.config["default_path"],
 			self.data["Model Type"].text,
 			self.data["SD Version"].text,
@@ -140,6 +139,6 @@ class FileDetailsWidget(QWidget):
 		)
 
 		self.data["Path"].text = os.path.join(
-			self.destination_path,
+			path,
 			self.data["Model Name"].text + self.file_extension
 		)

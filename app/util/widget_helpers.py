@@ -1,7 +1,7 @@
 
 from PyQt5.QtWidgets import (
 	QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,QButtonGroup,QRadioButton,
-	QLineEdit, QTextEdit, QCheckBox, QSlider
+	QLineEdit, QTextEdit, QCheckBox, QSlider, QComboBox
 )
 from PyQt5.QtCore import Qt
 
@@ -18,10 +18,11 @@ class QGeneric:
 		self.value = ""
 
 		self.widget = {
-			"line"   : self._new_line,
-			"text"   : self._new_text,
-			"radio"  : self._new_radio,
-			"slider" : self._new_slider
+			"line"    : self._new_line,
+			"text"    : self._new_text,
+			"radio"   : self._new_radio,
+			"slider"  : self._new_slider,
+			"dropdown": self._new_dropdown
 		}[self.table["widget"]](label, table)
 	
 	########## Attributes ##########
@@ -36,6 +37,8 @@ class QGeneric:
 				for button in self.widget_core.buttons():
 					if button.isChecked():
 						return button.text()
+			case "dropdown":
+				return self.widget_core.currentText()
 		return ""
 
 	@text.setter
@@ -48,6 +51,8 @@ class QGeneric:
 					if button.text() == str(new):
 						button.setChecked(True)
 						return
+			case "dropdown":
+				self.widget_core.setCurrentText(str(new))
 
 	########## Constructors ##########
 	def _new_line(self, label, table):
@@ -143,6 +148,22 @@ class QGeneric:
 		widget.setLayout(layout)
 		return widget
 	
+	def _new_dropdown(self, label, table):
+		widget = QWidget()
+		layout = QHBoxLayout()
+		self.widget_core = QComboBox()
+
+		if table["default"] == "":
+			self.widget_core.addItem("")
+			
+		for option in table["options"]:
+			self.widget_core.addItem(str(option))
+
+		layout.addWidget(QLabel(label))
+		layout.addWidget(self.widget_core)
+		widget.setLayout(layout)
+		return widget
+	
 	########## Data Managers ##########
 	def _slider_sync(self, value):
 		'''
@@ -175,6 +196,8 @@ class QGeneric:
 				self.widget_core.buttonClicked.connect(func)
 			case "slider":
 				self.widget_core.valueChanged.connect(func)
+			case "dropdown":
+				self.widget_core.currentIndexChanged.connect(func)
 
 def new_button(button_name, button_function):
 	button = QPushButton(button_name)

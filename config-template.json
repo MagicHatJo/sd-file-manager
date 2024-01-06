@@ -17,6 +17,13 @@
         "Category" : {
             "widget"  : "line",
             "default" : "",
+            "options": [
+                "art_style",
+                "background",
+                "characters",
+                "pose",
+                "tools"
+            ],
             "remember_last" : false
         },
         "Model ID" : {
