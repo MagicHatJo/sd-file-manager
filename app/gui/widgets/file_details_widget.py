@@ -11,8 +11,9 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import Qt
 
 from app.util.widget_helpers import (
-	new_widget, new_button, new_radio_button_group,
-	get_text, set_text, clear_layout
+	QGeneric,
+	new_button,
+	clear_layout
 )
 from app.util import config
 
@@ -30,9 +31,6 @@ class FileDetailsWidget(QWidget):
 		self.file_extension = ""
 
 		self.destination_path    = ""
-		# self.destination_display = QLineEdit()
-
-		self._fixed_width = 350
 
 		self.data   = None
 		self.layout = None
@@ -66,12 +64,12 @@ class FileDetailsWidget(QWidget):
 		# Create output format
 		data = {
 			"original name"    : self.file_name,
-			"id"               : get_text(self.data["Model ID"]),
-			"description"      : get_text(self.data["Description"]),
-			"sd version"       : get_text(self.data["SD Version"]),
-			"activation text"  : get_text(self.data["Activation"]),
-			"preferred weight" : get_text(self.data["Weight"]),
-			"notes"            : get_text(self.data["Notes"])
+			"id"               : self.data["Model ID"].text,
+			"description"      : self.data["Description"].text,
+			"sd version"       : self.data["SD Version"].text,
+			"activation text"  : self.data["Activation"].text,
+			"preferred weight" : self.data["Weight"].text,
+			"notes"            : self.data["Notes"].text
 		}
 		# TODO error handle this part
 		# TODO add image moving here
@@ -109,72 +107,26 @@ class FileDetailsWidget(QWidget):
 		layout = QVBoxLayout()
 		
 		for label, table in self.config["layout"].items():
-			self._new_parameter(data, layout, label, table)
+			data[label] = QGeneric(label, table)
+			layout.addWidget(data[label].widget)
+			# self._new_parameter(data, layout, label, table)
 		
 		layout.addWidget(new_button("Save", self.save_file))
 		
 		self.data   = data
 		self.layout = layout
-
-	def _new_parameter(self, data, layout, label, line):
-		# TODO maybe change this to not need "widget" tag
-		match line["widget"]:
-			case "line":
-				insert = QLineEdit()
-				insert.setFixedWidth(self._fixed_width)
-				data[label] = insert
-				layout.addWidget(new_widget(label, insert))
-			case "text":
-				insert = QTextEdit()
-				insert.setFixedWidth(self._fixed_width)
-				data[label] = insert
-				layout.addWidget(new_widget(label, insert))
-			case "radio":
-				radio_widget = QWidget()
-				radio_layout = QHBoxLayout()
-				button_group = QButtonGroup()
-
-				for option in line["options"]:
-					radio_button = QRadioButton(str(option))
-					radio_button.setStyleSheet(
-						'''
-						QRadioButton{
-							border: 1px solid grey;
-							border-radius: 4px;
-							padding: 5px;
-						}
-						'''
-					)
-					
-					radio_layout.addWidget(radio_button)
-					button_group.addButton(radio_button)
-
-					if option == line["default"]:
-						radio_button.setChecked(True)
-
-				radio_widget.setLayout(radio_layout)
-				data[label] = button_group
-				layout.addWidget(new_widget(label, radio_widget))
-	
+			
 	def _connect_destination_paths(self, data):
 		# TODO make this dynamic based on configuration path options
-		pass
-		data["Model Name"].textChanged.connect(self._update_destination_path)
+		data["Model Name"].widget_core.textChanged.connect(self._update_destination_path)
 		
-		data["Model Type"].buttonClicked.connect(self._update_destination_path)
-		data["Category"  ].textChanged.connect(self._update_destination_path)
-		data["Model ID"  ].textChanged.connect(self._update_destination_path)
-		data["SD Version"].buttonClicked.connect(self._update_destination_path)
+		data["Model Type"].widget_core.buttonClicked.connect(self._update_destination_path)
+		data["Category"  ].widget_core.textChanged.connect(self._update_destination_path)
+		data["Model ID"  ].widget_core.textChanged.connect(self._update_destination_path)
+		data["SD Version"].widget_core.buttonClicked.connect(self._update_destination_path)
 
-		# TODO Remove Hard coding
-
-		# Weight
-		# data["Weight"].setRange(
-		# 	self.config["preferred_weight"]["bounds"]["lower"],
-		# 	self.config["preferred_weight"]["bounds"]["upper"]
-		# )
-
-		# data["Weight"].valueChanged.connect(self._weight_changed)
+		# data["Weight"]["value"].textChanged.connect(self._weight_changed)
+		# data["Weight"]["slider"].valueChanged.connect(self._weight_changed)
 	
 	########## Data Managers ##########
 	def _set_text(self, key, value=""):
@@ -182,9 +134,9 @@ class FileDetailsWidget(QWidget):
 		Sets text on load.
 		'''
 		if value != "" or key not in self.config["layout"]:
-			set_text(self.data[key], value)
+			self.data[key].text = value
 		elif not self.config["layout"][key].get("remember_last", False):
-			set_text(self.data[key], self.config["layout"][key].get("default", value))
+			self.data[key].text = self.config["layout"][key].get("default", value)
 
 	def _update_destination_path(self):
 		'''
@@ -196,15 +148,16 @@ class FileDetailsWidget(QWidget):
 		# TODO make this not hardcoded.
 		self.destination_path = os.path.join(
 			self.config["default_path"],
-			get_text(self.data["Model Type"]),
-			get_text(self.data["SD Version"]),
-			get_text(self.data["Category"])
+			self.data["Model Type"].text,
+			self.data["SD Version"].text,
+			self.data["Category"].text
 		)
 
 		self.data["Path"].setText(os.path.join(
 			self.destination_path,
-			get_text(self.data["Model Name"]) + self.file_extension
+			self.data["Model Name"].text + self.file_extension
 		))
 	
 	# def _weight_changed(self, value):
-	# 	self.data["Weight"].label.setText(f"Weight {value}")
+	# 	self.data["Weight"]["value"].setText(f"{value}")
+	# 	self.data["Weight"]["slider"].setValue(value)
