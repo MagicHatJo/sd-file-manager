@@ -28,12 +28,11 @@ class FileDetailsWidget(QWidget):
 		
 		self.file_path = ""
 		self.file_name = ""
-		self.file_extension = ""
+		self.file_extension   = ""
+		self.destination_path = ""
 
-		self.destination_path    = ""
-
-		self.data   = None
-		self.layout = None
+		self.data   = {}
+		self.layout = QVBoxLayout()
 		self._init_data()
 
 		self.setLayout(self.layout)
@@ -90,40 +89,40 @@ class FileDetailsWidget(QWidget):
 		Helper function to initialize GUI data.
 		Should only be used once on construction.
 		'''
-		self._new_load_parameters()
+		self._load_parameters()
+		self._load_defaults()
 		self._connect_destination_paths(self.data)
-		# load default data
 
-	def _new_load_parameters(self):
+	def _load_parameters(self):
 		'''
-		Initializes GI data and layout.
+		Initializes GUI data and layout.
 		These must be done concurrently due to limitations with accessing
 		different QObjects.
 		data   - contains QObjects
 		layout - contains wrapped objects
 		'''
-
-		data = {}
-		layout = QVBoxLayout()
 		
 		for label, table in self.config["layout"].items():
-			data[label] = QGeneric(label, table)
-			layout.addWidget(data[label].widget)
-			# self._new_parameter(data, layout, label, table)
+			self.data[label] = QGeneric(label, table)
+			self.layout.addWidget(self.data[label].widget)
 		
-		layout.addWidget(new_button("Save", self.save_file))
-		
-		self.data   = data
-		self.layout = layout
+		self.layout.addWidget(new_button("Save", self.save_file))
+	
+	def _load_defaults(self):
+		'''
+		Loads default data into GUI.
+		'''
+		for label, q in self.data.items():
+			q.text = self.config["layout"][label].get("default", "")
 			
 	def _connect_destination_paths(self, data):
 		# TODO make this dynamic based on configuration path options
-		data["Model Name"].widget_core.textChanged.connect(self._update_destination_path)
+		data["Model Name"].connect(self._update_destination_path)
 		
-		data["Model Type"].widget_core.buttonClicked.connect(self._update_destination_path)
-		data["Category"  ].widget_core.textChanged.connect(self._update_destination_path)
-		data["Model ID"  ].widget_core.textChanged.connect(self._update_destination_path)
-		data["SD Version"].widget_core.buttonClicked.connect(self._update_destination_path)
+		data["Model Type"].connect(self._update_destination_path)
+		data["Category"  ].connect(self._update_destination_path)
+		data["Model ID"  ].connect(self._update_destination_path)
+		data["SD Version"].connect(self._update_destination_path)
 
 		# data["Weight"]["value"].textChanged.connect(self._weight_changed)
 		# data["Weight"]["slider"].valueChanged.connect(self._weight_changed)
@@ -144,7 +143,6 @@ class FileDetailsWidget(QWidget):
 		Event handler for changes to data relevant to destination path.
 		Updates destination display.
 		'''
-		print("entering update destination path")
 		# TODO make this not hardcoded.
 		self.destination_path = os.path.join(
 			self.config["default_path"],
@@ -153,11 +151,7 @@ class FileDetailsWidget(QWidget):
 			self.data["Category"].text
 		)
 
-		self.data["Path"].setText(os.path.join(
+		self.data["Path"].text = os.path.join(
 			self.destination_path,
 			self.data["Model Name"].text + self.file_extension
-		))
-	
-	# def _weight_changed(self, value):
-	# 	self.data["Weight"]["value"].setText(f"{value}")
-	# 	self.data["Weight"]["slider"].setValue(value)
+		)

@@ -1,8 +1,9 @@
 
 from PyQt5.QtWidgets import (
-	QWidget, QHBoxLayout, QLabel, QPushButton,QButtonGroup,QRadioButton,
-	QLineEdit, QTextEdit, QCheckBox
+	QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,QButtonGroup,QRadioButton,
+	QLineEdit, QTextEdit, QCheckBox, QSlider
 )
+from PyQt5.QtCore import Qt
 
 fixed_width = 350 # TODO move to config
 
@@ -13,11 +14,14 @@ class QGeneric:
 	def __init__(self, label, table):
 		self.label = label
 		self.table = table
+		self.widget_core = None
+		self.value = ""
 
 		self.widget = {
-			"line"  : self._new_line,
-			"text"  : self._new_text,
-			"radio" : self._new_radio
+			"line"   : self._new_line,
+			"text"   : self._new_text,
+			"radio"  : self._new_radio,
+			"slider" : self._new_slider
 		}[self.table["widget"]](label, table)
 	
 	########## Attributes ##########
@@ -47,6 +51,9 @@ class QGeneric:
 
 	########## Constructors ##########
 	def _new_line(self, label, table):
+		'''
+		Initializes self with QLineEdit data.
+		'''
 		self.widget_core = QLineEdit()
 		self.widget_core.setFixedWidth(fixed_width)
 		
@@ -58,6 +65,9 @@ class QGeneric:
 		return widget
 
 	def _new_text(self, label, table):
+		'''
+		Initializes self with QTextEdit data.
+		'''
 		self.widget_core = QTextEdit()
 		self.widget_core.setFixedWidth(fixed_width)
 
@@ -69,6 +79,9 @@ class QGeneric:
 		return widget
 	
 	def _new_radio(self, label, table):
+		'''
+		Initializes self with QButtonGroup for QRadioButton data.
+		'''
 		widget = QWidget()
 		layout = QHBoxLayout()
 		layout.addWidget(QLabel(label))
@@ -94,7 +107,71 @@ class QGeneric:
 
 		widget.setLayout(layout)
 		return widget
+	
+	def _new_slider(self, label, table):
+		'''
+		Initializes self with QSlider data.
+		Slider step must be int, so multiply / divide by 10 to convert decimals.
+		'''
+		widget = QWidget()
+		layout = QVBoxLayout()
 
+		# Upper
+		upper_widget = QWidget()
+		upper_layout = QHBoxLayout()
+		
+		self.value = QLineEdit()
+		self.value.setFixedWidth(50)
+		self.value.setText(str(table.get("default", "1")))
+		upper_layout.addWidget(QLabel(label))
+		upper_layout.addWidget(self.value)
+		upper_widget.setLayout(upper_layout)
+
+		# Lower
+		self.widget_core = QSlider()
+		self.widget_core.setOrientation(Qt.Horizontal)
+		self.widget_core.setRange(table["bounds"]["lower"] * 10, table["bounds"]["upper"] * 10)
+		self.widget_core.setValue(table.get("default", 10))
+		self.widget_core.setSingleStep(1)
+
+		self.value.textChanged.connect(self._slider_sync)
+		self.widget_core.valueChanged.connect(self._slider_sync)
+
+		# Compose
+		layout.addWidget(upper_widget)
+		layout.addWidget(self.widget_core)
+		widget.setLayout(layout)
+		return widget
+	
+	########## Data Managers ##########
+	def _slider_sync(self, value):
+		'''
+		Link to change in slider activity.
+		Multiply / divide by 10 to convert decimals.
+		'''
+		match value:
+			case "-" | "":
+				return
+			case int():
+				self.value.setText(str(value / 10 if value % 10 else value // 10))
+			case str():
+				self.widget_core.setValue(int(float(value) * 10))
+				if not self.table["bounds"]["lower"] <= float(value) <= self.table["bounds"]["upper"]:
+					self.value.setText(str(min(max(
+						float(value),
+						self.table["bounds"]["lower"]),
+						self.table["bounds"]["upper"]
+					)))
+	
+	########## Signals ##########
+	def connect(self, func):
+		match self.table["widget"]:
+			case "line" | "text":
+				self.widget_core.textChanged.connect(func)
+			case "radio":
+				self.widget_core.buttonClicked.connect(func)
+			case "slider":
+				self.widget_core.valueChanged.connect(func)
 def new_button(button_name, button_function):
 	button = QPushButton(button_name)
 	button.clicked.connect(button_function)
