@@ -44,10 +44,10 @@ The link path would be
     - [ ] file type (checkpoint, lora, etc)
 	- [ ] sd version
  - [ ] Add feature to auto move a preview image with the same name if exists
- - [ ] Add feature to have config determine possible :
+ - [x] Add feature to have config determine possible :
     - [x] Model Types (radio buttons)
-	- [ ] Categories  (dropdown)
-	- [ ] SD Version  (dropdown)
+	- [x] Categories  (dropdown)
+	- [x] SD Version  (dropdown)
 	- [x] Preferred Weight (slider)
  - [x] Logging
 
