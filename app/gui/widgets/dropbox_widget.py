@@ -4,12 +4,10 @@ from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel
 from PyQt5.QtCore import Qt
 
 class DropboxWidget(QWidget):
-	# TODO make this a dedicated spot for dropping data.
-	# have this display the original file path
-	# have this display asdsociated files (image moving, json?)
+	# TODO have this display associated files (image moving, json?)
 	'''
-	Placeholder widget for no file loaded.
-	Should not interact with data.
+	Widget that recieves drag and drop files.
+	self.load should be initialized to a function that connects the file path.
 	'''
 	def __init__(self):
 		super().__init__()

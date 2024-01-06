@@ -42,7 +42,7 @@ class FileDetailsWidget(QWidget):
 		
 		for key in self.data:
 			self._set_text(key)
-		self.data["Model Name"].setText(self.file_name)
+		self.data["Model Name"].text = self.file_name
 
 		self._update_destination_path()
 	
