@@ -2,19 +2,10 @@ import os
 import json
 import shutil
 
-from PyQt5.QtWidgets import (
-	QWidget,
-	QVBoxLayout, QHBoxLayout,
-	QLabel, QPushButton,QButtonGroup, QRadioButton,
-	QLineEdit, QTextEdit, QSlider
-)
+from PyQt5.QtWidgets import QWidget, QVBoxLayout
 from PyQt5.QtCore import Qt
 
-from app.util.widget_helpers import (
-	QGeneric,
-	new_button,
-	clear_layout
-)
+from app.util.widget_helpers import QGeneric, new_button
 from app.util import config
 
 class FileDetailsWidget(QWidget):
@@ -123,9 +114,6 @@ class FileDetailsWidget(QWidget):
 		data["Category"  ].connect(self._update_destination_path)
 		data["Model ID"  ].connect(self._update_destination_path)
 		data["SD Version"].connect(self._update_destination_path)
-
-		# data["Weight"]["value"].textChanged.connect(self._weight_changed)
-		# data["Weight"]["slider"].valueChanged.connect(self._weight_changed)
 	
 	########## Data Managers ##########
 	def _set_text(self, key, value=""):

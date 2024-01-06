@@ -165,6 +165,9 @@ class QGeneric:
 	
 	########## Signals ##########
 	def connect(self, func):
+		'''
+		Wrapper for signal connections from specific QObjects.
+		'''
 		match self.table["widget"]:
 			case "line" | "text":
 				self.widget_core.textChanged.connect(func)
@@ -172,6 +175,7 @@ class QGeneric:
 				self.widget_core.buttonClicked.connect(func)
 			case "slider":
 				self.widget_core.valueChanged.connect(func)
+
 def new_button(button_name, button_function):
 	button = QPushButton(button_name)
 	button.clicked.connect(button_function)

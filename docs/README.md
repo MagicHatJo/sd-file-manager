@@ -45,10 +45,10 @@ The link path would be
 	- [ ] sd version
  - [ ] Add feature to auto move a preview image with the same name if exists
  - [ ] Add feature to have config determine possible :
-    - [ ] Model Types (radio buttons)
+    - [x] Model Types (radio buttons)
 	- [ ] Categories  (dropdown)
 	- [ ] SD Version  (dropdown)
-	- [ ] Preferred Weight (slider)
+	- [x] Preferred Weight (slider)
  - [x] Logging
 
 ## License

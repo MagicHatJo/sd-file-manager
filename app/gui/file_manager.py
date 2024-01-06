@@ -5,8 +5,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QDialog, QMenuBa
 from PyQt5.QtCore    import Qt
 
 from app.gui.widgets import DropboxWidget, FileDetailsWidget
-from app.gui.windows import LogWindow
-from app.gui.config  import ConfigWindow
+from app.gui.windows import LogWindow, ConfigWindow
 
 class FileManager(QMainWindow):
 	'''
@@ -45,34 +44,6 @@ class FileManager(QMainWindow):
 		self.central_widget = QWidget(self)
 		self.central_widget.setLayout(self.layout)
 		self.setCentralWidget(self.central_widget)
-
-	########## Event Handler ##########
-	# def dragEnterEvent(self, event):
-	# 	if event.mimeData().hasUrls():
-	# 		event.accept()
-	# 	else:
-	# 		event.ignore()
-
-	# def dragMoveEvent(self, event):
-	# 	if event.mimeData().hasUrls():
-	# 		event.accept()
-	# 	else:
-	# 		event.ignore()
-
-	# def dropEvent(self, event):
-	# 	if event.mimeData().hasUrls():
-	# 		event.setDropAction(Qt.CopyAction)
-	# 		try:
-	# 			# TODO file validation
-	# 			self.widget_details.load_file(event.mimeData().urls()[0].toLocalFile())
-	# 			# self.setCentralWidget(self.widget_details)
-	# 			logging.info(f"Loaded {event.mimeData().urls()[0].toLocalFile()}")
-	# 		except:
-	# 			self.setCentralWidget(self.widget_dropbox)
-	# 			logging.error(f"Failed to load {event.mimeData().urls()[0].toLocalFile()}")
-	# 		event.accept()
-	# 	else:
-	# 		event.ignore()
 	
 	########## Menu Bar ##########
 	def action_config(self):

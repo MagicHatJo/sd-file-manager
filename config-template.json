@@ -1,28 +1,57 @@
 {
-	"Default Path": "/path/to/folder",
-	"Model Type": {
-		"default": "Lora",
-		"remember_last": true
-	},
-	"Category": {
-		"default": "",
-		"remember_last": false
-	},
-	"SD Version": {
-		"default": 1.5,
-		"options": [
-			1.5,
-			2.0,
-			"SDXL"
-		],
-		"remember_last": true
-	},
-	"Preferred Weight": {
-		"default": 1.0,
-		"bounds": {
-			"lower": -10,
-			"upper": 10
-		},
-		"remember_last": false
-	}
+    "default_path": "/path/to/folder",
+    "layout": {
+        "Model Name" : {
+            "widget" : "line"
+        },
+        "Model Type" : {
+            "widget"  : "radio",
+            "default" : "Lora",
+            "options" : [
+                "Lora",
+                "LyCORIS",
+                "Checkpoint"
+            ],
+            "remember_last" : true
+        },
+        "Category" : {
+            "widget"  : "line",
+            "default" : "",
+            "remember_last" : false
+        },
+        "Model ID" : {
+            "widget" : "line"
+        },
+        "Description" : {
+            "widget" : "text"
+        },
+        "SD Version" : {
+            "widget" : "radio",
+            "default" : "SDXL",
+            "options" : [
+                1.5,
+                2.0,
+                "SDXL"
+            ],
+            "remember_last" : true
+        },
+        "Activation" : {
+            "widget" : "line"
+        },
+        "Weight" : {
+            "widget" : "slider",
+            "default": 1,
+            "bounds" : {
+                "lower" : -10,
+                "upper" :  10
+            },
+            "remember_last" : false
+        },
+        "Notes" : {
+            "widget" : "text"
+        },
+        "Path" : {
+            "widget" : "line"
+        }
+    }
 }
