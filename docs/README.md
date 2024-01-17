@@ -50,6 +50,7 @@ The link path would be
 	- [x] SD Version  (dropdown)
 	- [x] Preferred Weight (slider)
  - [x] Logging
+ - [x] Launcher
 
 ## License
 [GPLv3](https://www.gnu.org/licenses/gpl-3.0.html).
