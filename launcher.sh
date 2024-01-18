@@ -66,5 +66,5 @@ else
 fi
 
 ##### launch #####
-printf "Launching sd-file-manager."
+printf "Launching sd-file-manager.\n"
 "${python_cmd}" main.py

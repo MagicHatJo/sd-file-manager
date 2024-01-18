@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QWidget, QVBoxLayout
 from PyQt5.QtCore import Qt
 
 from app.util.widget_helpers import QGeneric, new_button
-from app.util import config
+from app.util import config, detect
 
 class FileDetailsWidget(QWidget):
 	'''
@@ -33,16 +33,15 @@ class FileDetailsWidget(QWidget):
 		Connects to new file event.
 		Manages population of default values in data.
 		'''
-		# TODO Open loaded file
-		# Read auto fill info
 
 		self.file_path = file_path
 		self.file_name, self.file_extension = os.path.splitext(os.path.basename(file_path))
 		
 		for key in self.data:
 			self._set_text(key)
-		self.data["Model Name"].text = self.file_name
+		self._set_text("Model Name", self.file_name)
 
+		self._autofill(file_path)
 		self._update_destination_path()
 	
 	def save_file(self):
@@ -142,3 +141,14 @@ class FileDetailsWidget(QWidget):
 			path,
 			self.data["Model Name"].text + self.file_extension
 		)
+	
+	def _autofill(self, file_path):
+		'''
+		Uses detected extension to auto fill parameters.
+		Work in progress.
+		'''
+		model_type = detect.extension(file_path)
+
+		match model_type:
+			case "Lora" | "LyCORIS" | "Checkpoint":
+				self._set_text("Model Type", model_type)
