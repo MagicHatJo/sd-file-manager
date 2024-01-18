@@ -5,7 +5,7 @@ import shutil
 from PyQt5.QtWidgets import QWidget, QVBoxLayout
 from PyQt5.QtCore import Qt
 
-from app.util.widget_helpers import QGeneric, new_button
+from app.util.widget import QGeneric, new_button
 from app.util import config, detect
 
 class FileDetailsWidget(QWidget):
