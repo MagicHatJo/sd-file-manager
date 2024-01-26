@@ -10,19 +10,35 @@ A small script to help sort downloaded models. This script will sort files into 
 ### Requirements
 Current build on Python 3.9.13
 Uses PyQt5
+Launcher 
 
 ### Run
+#### Linux
 ```
-python main.py
+launch/linux.sh
+```
+
+#### Windows
+```
+launch/windows.bat
+```
+
+#### Manual
+```
+python sd-file-manager.py
 ```
 
 ## Usage
 
-Drag and drop each file into the window. Fill in the information you want, and clicking save will do the transfer/create the json file. Changing the name will update the name of the file.
+Drag and drop each file into the window. Fill in the information you want, and clicking save will do the transfer/create the json file. Changing the name will update the name of the file. Path at the bottom shows a preview of final destination. It can be manually changed as needed.
+
+There is a very primitive safetensor file type check in place, but it is not comprehensive. Currently does a basic metadata check for Lora and Lycoris files.
 
 ## Configuration
 
-Rename config-template.json to config.json, and change your root path.
+Rename config-template.json to config.json, and change your root path. First launch of one of the launch scripts will create the config file for you using config-template.json.
+
+Config template can be modified to add/remove options in the various fields (ex: add more model types, more categories, etc).
 
 In the case of this example:
 ```
@@ -40,7 +56,7 @@ The link path would be
 ## Todo
  - [ ] Add configuration for different naming formats (ex. id-name.safetensor)
  - [x] Add configuration for default data
- - [ ] Add feature to auto populate fields
+ - [-] Add feature to auto populate fields
     - [ ] file type (checkpoint, lora, etc)
 	- [ ] sd version
  - [ ] Add feature to auto move a preview image with the same name if exists

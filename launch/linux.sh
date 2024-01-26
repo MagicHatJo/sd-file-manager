@@ -6,6 +6,7 @@ required_version="3.10.0"
 venv_dir=".venv"
 use_venv=1
 config_file="config.json"
+main="sd-file-manager"
 
 ##### python #####
 if command -v "$python_cmd" &>/dev/null
@@ -62,5 +63,5 @@ else
 fi
 
 ##### launch #####
-printf "Launching sd-file-manager.\n"
-"${python_cmd}" main.py
+printf "Launching ${main}.\n"
+"${python_cmd}" "${main}.py"
