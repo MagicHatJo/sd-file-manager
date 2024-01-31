@@ -26,6 +26,9 @@ class FileDetailsWidget(QWidget):
 		self._init_data()
 
 		self.setLayout(self.layout)
+	
+	def reload_config(self):
+		self.config = config.load()
 
 	########## File Handlers ##########
 	def load_file(self, file_path):

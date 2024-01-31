@@ -51,8 +51,9 @@ class FileManager(QMainWindow):
 		result = config_window.exec_()
 		if result == QDialog.Accepted:
 			logging.info("Saved configuration")
+			self.widget_details.reload_config()
 		else:
-			logging.error("Could not save configuration")
+			logging.error("Configuration not saved")
 	
 	def action_log(self):
 		self.log_window.show()
