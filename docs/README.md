@@ -10,17 +10,16 @@ A small script to help sort downloaded models. This script will sort files into 
 ### Requirements
 Current build on Python 3.9.13
 Uses PyQt5
-Launcher 
 
 ### Run
 #### Linux
 ```
-launch/linux.sh
+linux_launcher.sh
 ```
 
 #### Windows
 ```
-launch/windows.bat
+windows_launcher.bat
 ```
 
 #### Manual
@@ -33,6 +32,10 @@ python sd-file-manager.py
 Drag and drop each file into the window. Fill in the information you want, and clicking save will do the transfer/create the json file. Changing the name will update the name of the file. Path at the bottom shows a preview of final destination. It can be manually changed as needed.
 
 There is a very primitive safetensor file type check in place, but it is not comprehensive. Currently does a basic metadata check for Lora and Lycoris files.
+
+## Known Bugs
+- On larger files, the program will freeze a bit before saving. It's taking time to process/move the file and I haven't implemented a more efficient pipeline.
+- Sometimes, windows preview path will show a mix of both / and \\. This is a visual bug, the path gets sanitized through os.path.join. Not the best, but it works for now.
 
 ## Configuration
 
